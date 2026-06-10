@@ -1,5 +1,7 @@
 # Dreamine.PLC.Abstractions
 
+[English documentation](./README.md)
+
 Dreamine PLC 패키지군에서 공통으로 사용하는 PLC 통신 계약 레이어입니다.
 
 이 패키지는 PLC Client, Simulator Client, WPF 진단 UI, 프로토콜 어댑터가 공통으로 사용하는 벤더 중립 인터페이스와 모델을 정의합니다.

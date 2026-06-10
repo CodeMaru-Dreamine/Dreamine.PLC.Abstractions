@@ -1,5 +1,7 @@
 # Dreamine.PLC.Abstractions
 
+[Korean documentation](./README_KO.md)
+
 Common PLC communication contracts for the Dreamine PLC package family.
 
 This package defines vendor-neutral interfaces and models used by PLC clients, simulator clients, WPF diagnostics, and protocol adapters.
