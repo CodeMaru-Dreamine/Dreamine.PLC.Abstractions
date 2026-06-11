@@ -50,6 +50,7 @@ public class PlcResult
     /// <returns>A failed PLC result.</returns>
     public static PlcResult Failure(string message, int? errorCode = null)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(message);
         return new PlcResult(false, errorCode, message);
     }
 }

@@ -35,6 +35,7 @@ public sealed class PlcResult<T> : PlcResult
     /// <returns>A failed PLC result.</returns>
     public new static PlcResult<T> Failure(string message, int? errorCode = null)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(message);
         return new PlcResult<T>(false, default, errorCode, message);
     }
 }
