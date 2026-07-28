@@ -86,13 +86,23 @@ jobs:
 
           Invoke-RestMethod `
             -Method Post `
-            -Uri 'https://sonarcloud.io/api/new_code_periods/set' `
+            -Uri 'https://sonarcloud.io/api/settings/set' `
             -Headers $headers `
             -ContentType 'application/x-www-form-urlencoded' `
             -Body @{
-              project = $env:SONAR_PROJECT_KEY
-              type = 'NUMBER_OF_DAYS'
+              component = $env:SONAR_PROJECT_KEY
+              key = 'sonar.leak.period'
               value = '30'
+            } | Out-Null
+          Invoke-RestMethod `
+            -Method Post `
+            -Uri 'https://sonarcloud.io/api/settings/set' `
+            -Headers $headers `
+            -ContentType 'application/x-www-form-urlencoded' `
+            -Body @{
+              component = $env:SONAR_PROJECT_KEY
+              key = 'sonar.leak.period.type'
+              value = 'days'
             } | Out-Null
 
       - name: Restore
