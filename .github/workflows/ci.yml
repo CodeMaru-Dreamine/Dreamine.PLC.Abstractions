@@ -39,6 +39,35 @@ jobs:
         shell: pwsh
         run: dotnet tool install --global dotnet-sonarscanner --version $env:SONAR_SCANNER_VERSION
 
+      - name: Align SonarCloud default branch
+        if: env.SONAR_TOKEN != '' && github.event_name != 'pull_request'
+        shell: pwsh
+        env:
+          GITHUB_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          $headers = @{
+            Accept = 'application/json'
+            Authorization = "Bearer $env:SONAR_TOKEN"
+          }
+          $encodedProject = [Uri]::EscapeDataString($env:SONAR_PROJECT_KEY)
+          $branches = Invoke-RestMethod `
+            -Method Get `
+            -Uri "https://sonarcloud.io/api/project_branches/list?project=$encodedProject" `
+            -Headers $headers
+          $currentMain = $branches.branches | Where-Object isMain | Select-Object -First 1
+          if ($null -ne $currentMain -and $currentMain.name -ne $env:GITHUB_DEFAULT_BRANCH) {
+            Write-Host "Renaming SonarCloud main branch from '$($currentMain.name)' to '$env:GITHUB_DEFAULT_BRANCH'."
+            Invoke-RestMethod `
+              -Method Post `
+              -Uri 'https://sonarcloud.io/api/project_branches/rename' `
+              -Headers $headers `
+              -ContentType 'application/x-www-form-urlencoded' `
+              -Body @{
+                project = $env:SONAR_PROJECT_KEY
+                name = $env:GITHUB_DEFAULT_BRANCH
+              } | Out-Null
+          }
+
       - name: Restore
         shell: pwsh
         run: dotnet restore src/PLC.Abstractions/tests/Dreamine.PLC.Abstractions.Tests/Dreamine.PLC.Abstractions.Tests.csproj
