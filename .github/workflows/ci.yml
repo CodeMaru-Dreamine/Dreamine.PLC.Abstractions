@@ -84,6 +84,17 @@ jobs:
               } | Out-Null
           }
 
+          Invoke-RestMethod `
+            -Method Post `
+            -Uri 'https://sonarcloud.io/api/new_code_periods/set' `
+            -Headers $headers `
+            -ContentType 'application/x-www-form-urlencoded' `
+            -Body @{
+              project = $env:SONAR_PROJECT_KEY
+              type = 'NUMBER_OF_DAYS'
+              value = '30'
+            } | Out-Null
+
       - name: Restore
         shell: pwsh
         run: dotnet restore src/PLC.Abstractions/tests/Dreamine.PLC.Abstractions.Tests/Dreamine.PLC.Abstractions.Tests.csproj
