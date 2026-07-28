@@ -56,6 +56,22 @@ jobs:
             -Headers $headers
           $currentMain = $branches.branches | Where-Object isMain | Select-Object -First 1
           if ($null -ne $currentMain -and $currentMain.name -ne $env:GITHUB_DEFAULT_BRANCH) {
+            $conflictingBranch = $branches.branches |
+              Where-Object { -not $_.isMain -and $_.name -eq $env:GITHUB_DEFAULT_BRANCH } |
+              Select-Object -First 1
+            if ($null -ne $conflictingBranch) {
+              Write-Host "Removing stale SonarCloud branch '$env:GITHUB_DEFAULT_BRANCH' before renaming the main branch."
+              Invoke-RestMethod `
+                -Method Post `
+                -Uri 'https://sonarcloud.io/api/project_branches/delete' `
+                -Headers $headers `
+                -ContentType 'application/x-www-form-urlencoded' `
+                -Body @{
+                  project = $env:SONAR_PROJECT_KEY
+                  branch = $env:GITHUB_DEFAULT_BRANCH
+                } | Out-Null
+            }
+
             Write-Host "Renaming SonarCloud main branch from '$($currentMain.name)' to '$env:GITHUB_DEFAULT_BRANCH'."
             Invoke-RestMethod `
               -Method Post `
